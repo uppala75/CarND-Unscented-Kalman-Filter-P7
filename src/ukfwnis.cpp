@@ -104,21 +104,21 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 	if (meas_package.sensor_type_ == MeasurementPackage::LASER && use_laser_){
 	//if (meas_package.sensor_type_ == MeasurementPackage::LASER){
 	//Initialize
-		//cout << "Receiving LASER Data: " << endl;
+	//	cout << "Receiving LASER Data: " << endl;
 		x_(0) = meas_package.raw_measurements_(0);
 		x_(1) = meas_package.raw_measurements_(1);
-		//cout << "End Receiving LASER Data: " << endl;
+	//	cout << "End Receiving LASER Data: " << endl;
 	}
 	else if (meas_package.sensor_type_ == MeasurementPackage::RADAR && use_radar_){
 	//else if (meas_package.sensor_type_ == MeasurementPackage::RADAR){
 	//Initialize
-		//cout << "Receiving RADAR Data: " << endl;
+	//	cout << "Receiving RADAR Data: " << endl;
 		float ro = meas_package.raw_measurements_(0);
 		float phi = meas_package.raw_measurements_(1);
 		float ro_dot = meas_package.raw_measurements_(2);
 		x_(0) = ro*cos(phi);
 		x_(1) = ro*sin(phi);
-		//cout << "End Receiving RADAR Data: " << endl;
+	//	cout << "End Receiving RADAR Data: " << endl;
 	}
 	//Initialize remaining parameters
 
@@ -152,15 +152,15 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
   //***************
 
   if (meas_package.sensor_type_ == MeasurementPackage::LASER && use_laser_){
-  	//cout << "LIDAR Update begin " << endl;
+  //	cout << "LIDAR Update begin " << endl;
   	UpdateLidar(meas_package);
-  	//cout << "LIDAR Update end " << endl;
+  // 	cout << "LIDAR Update end " << endl;
 
   }
   else if (meas_package.sensor_type_ == MeasurementPackage::RADAR && use_radar_){
-  	//cout << "RADAR Update begin " << endl;
+  //	cout << "RADAR Update begin " << endl;
   	UpdateRadar(meas_package);
-  	//cout << "RADAR Update end " << endl;
+  //	cout << "RADAR Update end " << endl;
   }
 
  }
@@ -323,8 +323,8 @@ void UKF::Prediction(double delta_t) {
   	P_ = P_ + weights_(i) * x_diff * x_diff.transpose();
   }
 
-    //cout << "P_ prediction complete" << P_ << endl;
-    //cout << "x_ prediction complete" << x_ << endl;
+  //  cout << "P_ prediction complete" << P_ << endl;
+  //  cout << "x_ prediction complete" << x_ << endl;
  }
 /**
  * Updates the state and the state covariance matrix using a laser measurement.

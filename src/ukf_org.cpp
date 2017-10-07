@@ -104,21 +104,21 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 	if (meas_package.sensor_type_ == MeasurementPackage::LASER && use_laser_){
 	//if (meas_package.sensor_type_ == MeasurementPackage::LASER){
 	//Initialize
-		//cout << "Receiving LASER Data: " << endl;
+		cout << "Receiving LASER Data: " << endl;
 		x_(0) = meas_package.raw_measurements_(0);
 		x_(1) = meas_package.raw_measurements_(1);
-		//cout << "End Receiving LASER Data: " << endl;
+		cout << "End Receiving LASER Data: " << endl;
 	}
 	else if (meas_package.sensor_type_ == MeasurementPackage::RADAR && use_radar_){
 	//else if (meas_package.sensor_type_ == MeasurementPackage::RADAR){
 	//Initialize
-		//cout << "Receiving RADAR Data: " << endl;
+		cout << "Receiving RADAR Data: " << endl;
 		float ro = meas_package.raw_measurements_(0);
 		float phi = meas_package.raw_measurements_(1);
 		float ro_dot = meas_package.raw_measurements_(2);
 		x_(0) = ro*cos(phi);
 		x_(1) = ro*sin(phi);
-		//cout << "End Receiving RADAR Data: " << endl;
+		cout << "End Receiving RADAR Data: " << endl;
 	}
 	//Initialize remaining parameters
 
@@ -152,15 +152,15 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
   //***************
 
   if (meas_package.sensor_type_ == MeasurementPackage::LASER && use_laser_){
-  	//cout << "LIDAR Update begin " << endl;
+  	cout << "LIDAR Update begin " << endl;
   	UpdateLidar(meas_package);
-  	//cout << "LIDAR Update end " << endl;
+  	cout << "LIDAR Update end " << endl;
 
   }
   else if (meas_package.sensor_type_ == MeasurementPackage::RADAR && use_radar_){
-  	//cout << "RADAR Update begin " << endl;
+  	cout << "RADAR Update begin " << endl;
   	UpdateRadar(meas_package);
-  	//cout << "RADAR Update end " << endl;
+  	cout << "RADAR Update end " << endl;
   }
 
  }
@@ -208,7 +208,7 @@ void UKF::Prediction(double delta_t) {
   // Lesson 7.18: Augmentation assignment 2
   // ****************************
   //Create augmented mean state
-  //cout << "Prediction Start.." << endl;  
+  cout << "Prediction Start.." << endl;  
   VectorXd x_aug=VectorXd(n_aug_); //Augmented mean state vector
   x_aug.fill(0.0);
   MatrixXd P_aug=MatrixXd(n_aug_,n_aug_); //Augmented state covariance matrix
@@ -216,7 +216,7 @@ void UKF::Prediction(double delta_t) {
   MatrixXd Xsig_aug=MatrixXd(n_aug_, 2*n_aug_+1); //Augmented Sigma point matrix
   Xsig_aug.fill(0.0);
 
-  //std::cout << "n_aug_ = " << std::endl << n_aug_ << std::endl;
+  std::cout << "n_aug_ = " << std::endl << n_aug_ << std::endl;
 
   //create augmented mean state
   x_aug.head(5) = x_;
@@ -240,8 +240,8 @@ void UKF::Prediction(double delta_t) {
   }
 
   //print result
-  //std::cout << std::endl << "AugmentedSigmaPoints" << std::endl;
-  //std::cout << "Xsig_aug = " << std::endl << Xsig_aug << std::endl;
+  std::cout << std::endl << "AugmentedSigmaPoints" << std::endl;
+  std::cout << "Xsig_aug = " << std::endl << Xsig_aug << std::endl;
 
   // ****************************
   // Predict Sigma points
@@ -323,8 +323,8 @@ void UKF::Prediction(double delta_t) {
   	P_ = P_ + weights_(i) * x_diff * x_diff.transpose();
   }
 
-    //cout << "P_ prediction complete" << P_ << endl;
-    //cout << "x_ prediction complete" << x_ << endl;
+    cout << "P_ prediction complete" << P_ << endl;
+    cout << "x_ prediction complete" << x_ << endl;
  }
 /**
  * Updates the state and the state covariance matrix using a laser measurement.
@@ -428,11 +428,11 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
   x_ = x_ + K*z_diff;
   P_ = P_ - K*S*K.transpose();
 
-  //cout<<"P after laser update:"<< endl;
-  //cout<<P_<< endl;
+  cout<<"P after laser update:"<< endl;
+  cout<<P_<< endl;
 
-  //cout<<"x after laser update:"<< endl;
-  //cout<<x_<< endl;
+  cout<<"x after laser update:"<< endl;
+  cout<<x_<< endl;
 
 }
 
@@ -549,9 +549,9 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
   x_=x_ + K*z_diff;
   P_=P_ - K*S*K.transpose();
 
-  //cout<<"P after radar update:"<< endl;
-  //cout<<P_<< endl;
+  cout<<"P after radar update:"<< endl;
+  cout<<P_<< endl;
 
-  //cout<<"x after radar update:"<< endl;
-  //cout<<x_<< endl;
+  cout<<"x after radar update:"<< endl;
+  cout<<x_<< endl;
 }

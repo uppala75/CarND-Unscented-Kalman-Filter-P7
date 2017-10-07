@@ -10,6 +10,7 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 using std::vector;
 
+
 // for convenience
 using json = nlohmann::json;
 
@@ -29,8 +30,30 @@ std::string hasData(std::string s) {
   return "";
 }
 
-int main()
+void check_arguments(int argc, char* argv[]) {
+   string usage_instructions = "Usage instructions: ";
+   usage_instructions += argv[0];
+   usage_instructions += " output_file_name.txt";
+ 
+   bool has_valid_args = false;
+ 
+   // make sure the user has provided input and output files
+
+   if (argc == 1) {
+     cerr << "Please include an output file.\n" << usage_instructions << endl;
+   } else if (argc == 2) {
+     has_valid_args = true;
+   } else if (argc > 2) {    
+     cerr << "Too many arguments.\n" << usage_instructions << endl;
+   } 
+   if (!has_valid_args) {
+     exit(EXIT_FAILURE);
+   }
+}
+
+int main(int argc, char* argv[])
 {
+  check_arguments(argc, argv);
   uWS::Hub h;
 
   // Create a Kalman Filter instance
@@ -40,8 +63,24 @@ int main()
   Tools tools;
   vector<VectorXd> estimations;
   vector<VectorXd> ground_truth;
+  ofstream outfile;
+  if (argc == 2){
+    outfile.open(argv[1],ofstream::out);
+    outfile << "x_true" << ", ";
+    outfile << "y_true" << ", ";
+    outfile << "vx_true" << ", ";
+    outfile << "vy_true" << ", ";
+    outfile << "x_est" << ", ";
+    outfile << "y_est" << ", ";
+    outfile << "vx_est" << ", ";
+    outfile << "vy_est" << ", ";
+    outfile << "sensor" << ", ";
+    outfile << "nis" << endl;
+  }
 
-  h.onMessage([&ukf,&tools,&estimations,&ground_truth](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
+
+
+  h.onMessage([&ukf,&tools,&estimations,&ground_truth,&outfile](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -63,11 +102,12 @@ int main()
           
           MeasurementPackage meas_package;
           istringstream iss(sensor_measurment);
-    	  long long timestamp;
+    	    long long timestamp;
 
     	  // reads first element from the current line
     	  string sensor_type;
     	  iss >> sensor_type;
+        double nis;
 
     	  if (sensor_type.compare("L") == 0) {
       	  		meas_package.sensor_type_ = MeasurementPackage::LASER;
@@ -79,6 +119,8 @@ int main()
           		meas_package.raw_measurements_ << px, py;
           		iss >> timestamp;
           		meas_package.timestamp_ = timestamp;
+              nis = ukf.NIS_laser_;
+
         } else if (sensor_type.compare("R") == 0) {
 
       	  		meas_package.sensor_type_ = MeasurementPackage::RADAR;
@@ -92,6 +134,7 @@ int main()
           		meas_package.raw_measurements_ << ro,theta, ro_dot;
           		iss >> timestamp;
           		meas_package.timestamp_ = timestamp;
+              nis = ukf.NIS_radar_;
         }
         float x_gt;
     	  float y_gt;
@@ -129,6 +172,22 @@ int main()
     	  estimate(3) = v2;
     	  
     	  estimations.push_back(estimate);
+
+        if (outfile.is_open()){
+          outfile << fixed << setprecision(4) << x_gt << ", ";
+          outfile << fixed << setprecision(4) << y_gt << ", ";
+          outfile << fixed << setprecision(4) << vx_gt << ", ";
+          outfile << fixed << setprecision(4) << vy_gt << ", ";
+          outfile << fixed << setprecision(4) << p_x << ", ";
+          outfile << fixed << setprecision(4) << p_y << ", ";
+          outfile << fixed << setprecision(4) << v1 << ", ";
+          outfile << fixed << setprecision(4) << v2 << ", ";
+          outfile << sensor_type << ", ";
+        //if (sensor_type.compare("L") == 0) nis = ukf.nis_laser_;
+        //else if (sensor_type.compare("R") == 0) nis = ukf.nis_radar_;
+          outfile << fixed << setprecision(4) << nis << endl;
+        }
+
 
     	  VectorXd RMSE = tools.CalculateRMSE(estimations, ground_truth);
 
@@ -188,6 +247,10 @@ int main()
     return -1;
   }
   h.run();
+
+  if (outfile.is_open()){
+    outfile.close();
+  }
 }
 
 
